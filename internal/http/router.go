@@ -4,9 +4,11 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"github.com/Bekw/go-practicum-diploma/internal/storage"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(store *storage.Storage) http.Handler {
 	r := chi.NewRouter()
 
 	r.Post("/api/user/register", stubNotImplemented)
