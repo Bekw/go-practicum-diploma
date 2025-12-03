@@ -17,28 +17,24 @@ type Handler struct {
 
 func NewRouter(store *storage.Storage) http.Handler {
 	h := &Handler{store: store}
+
 	r := chi.NewRouter()
 
 	r.Post("/api/user/register", h.handleRegister)
 	r.Post("/api/user/login", h.handleLogin)
 
-	r.Post("/api/user/orders", h.stubAuthRequired)
-	r.Get("/api/user/orders", h.stubAuthRequired)
-	r.Get("/api/user/balance", h.stubAuthRequired)
-	r.Post("/api/user/balance/withdraw", h.stubAuthRequired)
-	r.Get("/api/user/withdrawals", h.stubAuthRequired)
+	r.Group(func(r chi.Router) {
+		r.Use(h.authMiddleware)
+
+		r.Post("/api/user/orders", h.handlePostOrder)
+		r.Get("/api/user/orders", h.handleGetOrders)
+
+		r.Get("/api/user/balance", h.handleGetBalance)
+		r.Post("/api/user/balance/withdraw", h.handleWithdraw)
+		r.Get("/api/user/withdrawals", h.handleGetWithdrawals)
+	})
 
 	return r
-}
-
-func stubNotImplemented(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-	_, _ = w.Write([]byte(`{"error":"not implemented yet"}`))
-}
-
-func (h *Handler) stubAuthRequired(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusUnauthorized)
-	_, _ = w.Write([]byte(`{"error":"unauthorized"}`))
 }
 
 type credentials struct {
