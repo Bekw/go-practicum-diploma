@@ -41,7 +41,7 @@ func (h *Handler) handlePostOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isLuhnValid(number) {
-		http.Error(w, "invalid order number", http.StatusUnprocessableEntity)
+		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -82,11 +82,6 @@ func (h *Handler) handleGetOrders(w http.ResponseWriter, r *http.Request) {
 	orders, err := h.store.ListOrdersByUser(ctx, userID)
 	if err != nil {
 		http.Error(w, "internal error", http.StatusInternalServerError)
-		return
-	}
-
-	if len(orders) == 0 {
-		w.WriteHeader(http.StatusNoContent) // 204
 		return
 	}
 
