@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
@@ -85,22 +86,23 @@ func (h *Handler) handleGetOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := make([]orderResponse, 0, len(orders))
-	for _, o := range orders {
+	resp := make([]orderResponse, len(orders))
+	for i, o := range orders {
 		var accrual *float64
 		if o.Accrual.Valid {
 			v := o.Accrual.Float64
 			accrual = &v
 		}
 
-		resp = append(resp, orderResponse{
+		resp[i] = orderResponse{
 			Number:     o.Number,
 			Status:     o.Status,
 			Accrual:    accrual,
 			UploadedAt: o.UploadedAt.Format(time.RFC3339),
-		})
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(resp)
 }
