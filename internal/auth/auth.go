@@ -12,7 +12,11 @@ import (
 
 const cookieName = "auth_token"
 
-var secret = []byte("super-secret-key")
+var secret []byte
+
+func Init(key string) {
+	secret = []byte(key)
+}
 
 func CookieName() string {
 	return cookieName
