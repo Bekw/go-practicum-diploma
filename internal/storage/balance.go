@@ -85,8 +85,8 @@ func (s *Storage) Withdraw(ctx context.Context, userID int64, order string, sum 
 	}
 
 	if _, err = tx.ExecContext(ctx,
-		`INSERT INTO withdrawals (user_id, order_number, sum)
-         VALUES ($1, $2, $3)`,
+		`INSERT INTO withdrawals (user_id, order_number, sum, processed_at)
+         VALUES ($1, $2, $3, NOW())`,
 		userID, order, sum,
 	); err != nil {
 		return err
@@ -98,8 +98,8 @@ func (s *Storage) Withdraw(ctx context.Context, userID int64, order string, sum 
 
 func (s *Storage) CreateWithdrawal(ctx context.Context, userID int64, order string, sum float64) error {
 	_, err := s.db.ExecContext(ctx,
-		`INSERT INTO withdrawals (user_id, order_number, sum)
-         VALUES ($1, $2, $3)`,
+		`INSERT INTO withdrawals (user_id, order_number, sum, processed_at)
+         VALUES ($1, $2, $3, NOW())`,
 		userID, order, sum,
 	)
 	return err
