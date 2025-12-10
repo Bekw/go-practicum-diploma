@@ -71,8 +71,7 @@ func (s *Storage) Withdraw(ctx context.Context, userID int64, order string, sum 
 	if err = tx.QueryRowContext(ctx,
 		`SELECT COALESCE(SUM(sum), 0)
          FROM withdrawals
-         WHERE user_id = $1
-         FOR UPDATE`,
+         WHERE user_id = $1`,
 		userID,
 	).Scan(&withdrawnTotal); err != nil {
 		return err
@@ -85,8 +84,8 @@ func (s *Storage) Withdraw(ctx context.Context, userID int64, order string, sum 
 	}
 
 	if _, err = tx.ExecContext(ctx,
-		`INSERT INTO withdrawals (user_id, order_number, sum, processed_at)
-         VALUES ($1, $2, $3, NOW())`,
+		`INSERT INTO withdrawals (user_id, order_number, sum)
+         VALUES ($1, $2, $3)`,
 		userID, order, sum,
 	); err != nil {
 		return err
